@@ -42,6 +42,17 @@ jobs:
           echo "$GITHUB_CONTEXT"
           echo "======================"
       
+      - name: Check event payload for reusable workflow info
+        run: |
+          echo "=== CHECKING EVENT PAYLOAD ==="
+          if [ -f "${GITHUB_EVENT_PATH}" ]; then
+            echo "Event payload contents:"
+            cat "${GITHUB_EVENT_PATH}"
+          else
+            echo "Event payload file not found"
+          fi
+          echo "=============================="
+      
       - name: Detect if using reusable workflow (using context)
         run: |
           echo "=== REUSABLE WORKFLOW DETECTION (using github context) ==="
@@ -49,4 +60,5 @@ jobs:
           echo "github.workflow_sha: ${{ github.workflow_sha }}"
           echo "GITHUB_WORKFLOW_REF env: ${GITHUB_WORKFLOW_REF}"
           echo "GITHUB_REPOSITORY: ${GITHUB_REPOSITORY}"
+          echo "Complete job name: ${{ github.job }}"
           echo "============================================================"
