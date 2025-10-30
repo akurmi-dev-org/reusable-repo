@@ -1,0 +1,58 @@
+name: Reusable Workflow Demo
+
+on:
+  workflow_call:
+    inputs:
+      test-input:
+        description: 'Test input parameter'
+        required: false
+        type: string
+        default: 'default-value'
+
+jobs:
+  reusable-job:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Print message
+        run: |
+          echo "Running from reusable workflow"
+          echo "Input received: ${{ inputs.test-input }}"
+      
+      - name: Print key environment variables
+        run: |
+          echo "=== KEY ENVIRONMENT VARIABLES ==="
+          echo "GITHUB_WORKFLOW_REF: $GITHUB_WORKFLOW_REF"
+          echo "GITHUB_REPOSITORY: $GITHUB_REPOSITORY"
+          echo "GITHUB_WORKFLOW: $GITHUB_WORKFLOW"
+          echo "GITHUB_JOB: $GITHUB_JOB"
+          echo "GITHUB_ACTION_PATH: $GITHUB_ACTION_PATH"
+          echo "================================="
+      
+      - name: Print all environment variables
+        run: |
+          echo "=== ALL ENVIRONMENT VARIABLES ==="
+          env | sort
+          echo "================================="
+      
+      - name: Detect if using reusable workflow
+        run: |
+          echo "=== REUSABLE WORKFLOW DETECTION ==="
+          WORKFLOW_REF="${GITHUB_WORKFLOW_REF}"
+          CURRENT_REPO="${GITHUB_REPOSITORY}"
+          
+          if [[ -n "$WORKFLOW_REF" ]]; then
+            # Extract repo from workflow ref
+            WORKFLOW_REPO=$(echo "$WORKFLOW_REF" | sed -E 's|^([^/]+/[^/]+)/.*|\1|')
+            
+            echo "Current repository: $CURRENT_REPO"
+            echo "Workflow repository: $WORKFLOW_REPO"
+            
+            if [[ "$WORKFLOW_REPO" != "$CURRENT_REPO" ]]; then
+              echo "✓ Using REUSABLE workflow from: $WORKFLOW_REF"
+            else
+              echo "✗ Using LOCAL workflow: $WORKFLOW_REF"
+            fi
+          else
+            echo "GITHUB_WORKFLOW_REF not available"
+          fi
+          echo "===================================="
