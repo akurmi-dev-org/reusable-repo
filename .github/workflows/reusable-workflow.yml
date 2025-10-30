@@ -34,25 +34,19 @@ jobs:
           env | sort
           echo "================================="
       
-      - name: Detect if using reusable workflow
+      - name: Print github context (as JSON)
+        env:
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: |
-          echo "=== REUSABLE WORKFLOW DETECTION ==="
-          WORKFLOW_REF="${GITHUB_WORKFLOW_REF}"
-          CURRENT_REPO="${GITHUB_REPOSITORY}"
-          
-          if [[ -n "$WORKFLOW_REF" ]]; then
-            # Extract repo from workflow ref
-            WORKFLOW_REPO=$(echo "$WORKFLOW_REF" | sed -E 's|^([^/]+/[^/]+)/.*|\1|')
-            
-            echo "Current repository: $CURRENT_REPO"
-            echo "Workflow repository: $WORKFLOW_REPO"
-            
-            if [[ "$WORKFLOW_REPO" != "$CURRENT_REPO" ]]; then
-              echo "✓ Using REUSABLE workflow from: $WORKFLOW_REF"
-            else
-              echo "✗ Using LOCAL workflow: $WORKFLOW_REF"
-            fi
-          else
-            echo "GITHUB_WORKFLOW_REF not available"
-          fi
-          echo "===================================="
+          echo "=== GITHUB CONTEXT ==="
+          echo "$GITHUB_CONTEXT"
+          echo "======================"
+      
+      - name: Detect if using reusable workflow (using context)
+        run: |
+          echo "=== REUSABLE WORKFLOW DETECTION (using github context) ==="
+          echo "github.workflow_ref: ${{ github.workflow_ref }}"
+          echo "github.workflow_sha: ${{ github.workflow_sha }}"
+          echo "GITHUB_WORKFLOW_REF env: ${GITHUB_WORKFLOW_REF}"
+          echo "GITHUB_REPOSITORY: ${GITHUB_REPOSITORY}"
+          echo "============================================================"
